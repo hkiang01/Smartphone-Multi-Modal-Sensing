@@ -41,7 +41,7 @@
         />
 
     <TextView
-        android:id="@+id/GyroXValueView"
+        android:id="@+id/GyroXcoordView"
         android:text="Gyro X"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -50,56 +50,56 @@
         />
 
     <TextView
-        android:id="@+id/GyroYValueView"
+        android:id="@+id/GyroYcoordView"
         android:text="Gyro Y"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/sensorview_text_size"
-        android:layout_below="@id/GyroXValueView"
+        android:layout_below="@id/GyroXcoordView"
         />
 
     <TextView
-        android:id="@+id/GyroZValueView"
+        android:id="@+id/GyroZcoordView"
         android:text="Gyro Z"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/sensorview_text_size"
-        android:layout_below="@id/GyroYValueView"
+        android:layout_below="@id/GyroYcoordView"
         />
 
     <TextView
-        android:id="@+id/MagnetXValueView"
+        android:id="@+id/MagnetXcoordView"
         android:text="Magnet X"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/sensorview_text_size"
-        android:layout_below="@id/GyroZValueView"
+        android:layout_below="@id/GyroZcoordView"
         />
 
     <TextView
-        android:id="@+id/MagnetYValueView"
+        android:id="@+id/MagnetYcoordView"
         android:text="Magnet Y"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/sensorview_text_size"
-        android:layout_below="@id/MagnetXValueView"
+        android:layout_below="@id/MagnetXcoordView"
         />
 
     <TextView
-        android:id="@+id/MagnetZValueView"
+        android:id="@+id/MagnetZcoordView"
         android:text="Magnet Z"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/sensorview_text_size"
-        android:layout_below="@id/MagnetYValueView"
+        android:layout_below="@id/MagnetYcoordView"
         />
 
     <TextView
-        android:id="@+id/LightValueView"
+        android:id="@+id/LightcoordView"
         android:text="Light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/sensorview_text_size"
-        android:layout_below="@id/MagnetZValueView"
+        android:layout_below="@id/MagnetZcoordView"
         />
 </RelativeLayout>

@@ -8,10 +8,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.opencsv.CSVWriter;
+
 import org.w3c.dom.Text;
+
+import java.io.File;
+import java.io.FileWriter;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
     private SensorManager sensorManager;
+
     TextView AccelXValueView;
     TextView AccelYValueView;
     TextView AccelZValueView;
@@ -31,7 +37,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_scrolling);
 
+        //http://stackoverflow.com/questions/27772011/how-to-export-data-to-csv-file-in-android
+        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        String fileName = "RUNNING.csv";
+        String filePath = baseDir + File.separator + fileName;
+        File f = new File(filePath );
+        FileWriter mFileWriter;
+        CSVWriter writer;
+
+        /*
+        //File exists
+        if(f.exists() && !f.isDirectory()) {
+            mFileWriter = new FileWriter(filePath, true);
+            //above throws IO Exception: http://www.anddev.org/working_with_files-t115.html
+
+            writer = new CSVWriter(mFileWriter);
+        }
+        */
+
+        //Link to layout
         AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
+        AccelYValueView=(TextView)findViewById(R.id.AccelYcoordView);
+        AccelZValueView=(TextView)findViewById(R.id.AccelZcoordView);
+        GyroXValueView=(TextView)findViewById(R.id.GyroXcoordView);
+        GyroYValueView=(TextView)findViewById(R.id.GyroYcoordView);
+        GyroZValueView=(TextView)findViewById(R.id.GyroZcoordView);
+        MagnetXValueView=(TextView)findViewById(R.id.MagnetXcoordView);
+        MagnetYValueView=(TextView)findViewById(R.id.MagnetYcoordView);
+        MagnetZValueView=(TextView)findViewById(R.id.MagnetZcoordView);
+        LightValueView=(TextView)findViewById(R.id.LightcoordView);
 
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
 
