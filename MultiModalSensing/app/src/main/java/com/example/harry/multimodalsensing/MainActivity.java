@@ -14,9 +14,12 @@ import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
     private SensorManager sensorManager;
+    private FileWriter mFileWriter;
+    private CSVWriter writer;
 
     TextView AccelXValueView;
     TextView AccelYValueView;
@@ -37,22 +40,43 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_scrolling);
 
+        //http://stackoverflow.com/questions/17645092/export-my-data-on-csv-file-from-app-android
         //http://stackoverflow.com/questions/27772011/how-to-export-data-to-csv-file-in-android
         String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
         String fileName = "RUNNING.csv";
         String filePath = baseDir + File.separator + fileName;
-        File f = new File(filePath );
-        FileWriter mFileWriter;
-        CSVWriter writer;
+
+        //Option 1:
+        try {
+            writer = new CSVWriter(new FileWriter(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //End of option 1
 
         /*
+        //Option 2:
+        File f = new File(filePath );
+
         //File exists
         if(f.exists() && !f.isDirectory()) {
-            mFileWriter = new FileWriter(filePath, true);
+            try {
+                mFileWriter = new FileWriter(filePath, true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             //above throws IO Exception: http://www.anddev.org/working_with_files-t115.html
 
             writer = new CSVWriter(mFileWriter);
         }
+        else {
+            try {
+                writer = new CSVWriter(new FileWriter(filePath));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //End of option 2
         */
 
         //Link to layout
@@ -71,19 +95,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
@@ -124,10 +148,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             LightValueView.setText("Light: "+l);
         }
+
+        String[] data = {AccelXValueView.getText().toString(),
+                         AccelYValueView.getText().toString(),
+                         AccelZValueView.getText().toString(),
+                         GyroXValueView.getText().toString(),
+                         GyroYValueView.getText().toString(),
+                         GyroZValueView.getText().toString(),
+                         MagnetXValueView.getText().toString(),
+                         MagnetYValueView.getText().toString(),
+                         MagnetZValueView.getText().toString(),
+                         LightValueView.getText().toString()};
+        writer.writeNext(data);
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
 }
