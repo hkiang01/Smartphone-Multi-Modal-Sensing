@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private FileWriter mFileWriter;
     private CSVWriter writer;
+    private boolean ready = false;
 
     TextView AccelXValueView;
     TextView AccelYValueView;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //Option 1:
         try {
             writer = new CSVWriter(new FileWriter(filePath));
+            ready = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -159,7 +161,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                          MagnetYValueView.getText().toString(),
                          MagnetZValueView.getText().toString(),
                          LightValueView.getText().toString()};
-        writer.writeNext(data);
+
+        if(ready) {
+            writer.writeNext(data);
+        }
     }
 
     @Override
