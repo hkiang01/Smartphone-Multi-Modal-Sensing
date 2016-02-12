@@ -1,5 +1,6 @@
 package com.example.harry.multimodalsensing;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,8 +14,12 @@ import com.opencsv.CSVWriter;
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
     private SensorManager sensorManager;
@@ -36,10 +41,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     TextView LightValueView;
 
+    private String filename;
+    private String format = "dd-MM-yy HH:mm:ss";
+    private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
+    private Context mContext;
+    private File file;
+    private FileOutputStream fos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_scrolling);
+
+        filename = "IDLE_" + sdf.format(new Date())/*.toString()*/ + "_0.csv";
 
         //Link to layout
         AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
@@ -111,17 +125,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             LightValueView.setText("Light: "+l);
         }
 
-        String data = AccelXValueView.getText().toString().substring(3) + "," +
-                         AccelYValueView.getText().toString().substring(3) + "," +
-                         AccelZValueView.getText().toString().substring(3) + "," +
-                         GyroXValueView.getText().toString().substring(3) + "," +
-                         GyroYValueView.getText().toString().substring(3) + "," +
-                         GyroZValueView.getText().toString().substring(3) + "," +
-                         MagnetXValueView.getText().toString().substring(3) + "," +
-                         MagnetYValueView.getText().toString().substring(3) + "," +
-                         MagnetZValueView.getText().toString().substring(3) + "," +
-                         LightValueView.getText().toString() + "/n";
-
+        //row data entry
+        String data = sdf.format(new Date())/*.toString()*/ + "," + //timestamp
+                //.substring(3) to get rid of "X: "
+                AccelXValueView.getText().toString().substring(3) + "," +
+                AccelYValueView.getText().toString().substring(3)  + "," +
+                AccelZValueView.getText().toString().substring(3) + "," +
+                GyroXValueView.getText().toString().substring(3) + "," +
+                GyroYValueView.getText().toString().substring(3) + "," +
+                GyroZValueView.getText().toString().substring(3) + "," +
+                MagnetXValueView.getText().toString().substring(3) + "," +
+                MagnetYValueView.getText().toString().substring(3) + "," +
+                MagnetZValueView.getText().toString().substring(3) + "," +
+                LightValueView.getText().toString().substring(7) + "\n";
     }
 
     @Override
