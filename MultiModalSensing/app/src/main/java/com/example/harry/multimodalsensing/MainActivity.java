@@ -8,6 +8,8 @@ import android.hardware.SensorManager;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.opencsv.CSVWriter;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView LightValueView;
 
     private String baseFolder;
+    private String exercise_type;
     private String filename;
     private String format = "dd-MM-yy HH:mm:ss";
     private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
@@ -53,15 +56,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private FileOutputStream fos;
     private File path;
     private FileWriter fWriter;
+    private boolean startClicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.content_scrolling);
+        setContentView(R.layout.select_activity);
 
         mContext = getApplicationContext();
 
-        filename = "IDLE_" + sdf.format(new Date())/*.toString()*/ + "_0.csv";
+        exercise_type = null;
+        startClicked = false;
+
+        while(exercise_type.equals(null));
+
+        filename = exercise_type + sdf.format(new Date())/*.toString()*/ + "_0.csv";
         //file = new File(mContext.getFilesDir(), filename);
         //file.setReadable(true, false);
 
@@ -80,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             System.out.println("else case");
         }
 
+        while(!startClicked);
+
+        setContentView(R.layout.content_scrolling);
         //Link to layout
         AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
         AccelYValueView=(TextView)findViewById(R.id.AccelYcoordView);
@@ -96,19 +108,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_FASTEST);
+                SensorManager.SENSOR_DELAY_NORMAL);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                SensorManager.SENSOR_DELAY_FASTEST);
+                SensorManager.SENSOR_DELAY_NORMAL);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_FASTEST);
+                SensorManager.SENSOR_DELAY_NORMAL);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-                SensorManager.SENSOR_DELAY_FASTEST);
+                SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -187,6 +199,48 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radio_walking:
+                if (checked)
+                    exercise_type = "WALKING";
+                    break;
+            case R.id.radio_running:
+                if (checked)
+                    exercise_type = "RUNNING";
+                    break;
+            case R.id.radio_idle:
+                if (checked)
+                    exercise_type = "IDLE";
+                    break;
+            case R.id.radio_stairs:
+                if (checked)
+                    exercise_type = "STAIRS";
+                    break;
+            case R.id.radio_jumping:
+                if (checked)
+                    exercise_type = "JUMPING";
+                    break;
+            case R.id.radio_ddr:
+                if (checked)
+                    exercise_type = "DDR";
+                    break;
+        }
+    }
+
+    public void startButtonClick(View view) {
+        startClicked = true;
+    }
+
+    public void stopButtonClick(View view) {
+        sensorManager.unregisterListener(this);
 
     }
 
