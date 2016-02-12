@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -14,9 +15,11 @@ import com.opencsv.CSVWriter;
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -41,19 +44,41 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     TextView LightValueView;
 
+    private String baseFolder;
     private String filename;
     private String format = "dd-MM-yy HH:mm:ss";
     private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
     private Context mContext;
     private File file;
     private FileOutputStream fos;
+    private File path;
+    private FileWriter fWriter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_scrolling);
 
+        mContext = getApplicationContext();
+
         filename = "IDLE_" + sdf.format(new Date())/*.toString()*/ + "_0.csv";
+        //file = new File(mContext.getFilesDir(), filename);
+        //file.setReadable(true, false);
+
+        //check if external storage is available
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            //baseFolder = mContext.getExternalFilesDir(null).getAbsolutePath();
+            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            file = new File(path, filename);
+            path.mkdirs();
+            System.out.println("if case");
+        }
+        //revert to internal storage
+        else {
+            baseFolder = mContext.getFilesDir().getAbsolutePath();
+            file = new File(baseFolder + filename);
+            System.out.println("else case");
+        }
 
         //Link to layout
         AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
@@ -138,6 +163,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 MagnetYValueView.getText().toString().substring(3) + "," +
                 MagnetZValueView.getText().toString().substring(3) + "," +
                 LightValueView.getText().toString().substring(7) + "\n";
+
+        /*
+        try{
+            fos = openFileOutput(filename, Context.MODE_PRIVATE);
+            fos.write(data.getBytes());
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        */
+
+        try{
+            fWriter = new FileWriter(file, true);
+            fWriter.write(data);
+            fWriter.flush();
+            fWriter.close();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
