@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private File file;
     private FileOutputStream fos;
     private File path;
+    private FileWriter fWriter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,20 +163,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 MagnetYValueView.getText().toString().substring(3) + "," +
                 MagnetZValueView.getText().toString().substring(3) + "," +
                 LightValueView.getText().toString().substring(7) + "\n";
+
         /*
-        try {
-            fos = new FileOutputStream(file);
-            fos.write(data.getBytes());
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        */
         try{
             fos = openFileOutput(filename, Context.MODE_PRIVATE);
             fos.write(data.getBytes());
             fos.close();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        */
+
+        try{
+            fWriter = new FileWriter(file, true);
+            fWriter.write(data);
+            fWriter.flush();
+            fWriter.close();
+        }catch (Exception e) {
             e.printStackTrace();
         }
 
