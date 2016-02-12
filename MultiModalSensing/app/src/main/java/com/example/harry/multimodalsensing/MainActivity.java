@@ -41,46 +41,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_scrolling);
 
-        //http://stackoverflow.com/questions/17645092/export-my-data-on-csv-file-from-app-android
-        //http://stackoverflow.com/questions/27772011/how-to-export-data-to-csv-file-in-android
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName = "RUNNING.csv";
-        String filePath = baseDir + File.separator + fileName;
-
-        //Option 1:
-        try {
-            writer = new CSVWriter(new FileWriter(filePath));
-            ready = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //End of option 1
-
-        /*
-        //Option 2:
-        File f = new File(filePath );
-
-        //File exists
-        if(f.exists() && !f.isDirectory()) {
-            try {
-                mFileWriter = new FileWriter(filePath, true);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //above throws IO Exception: http://www.anddev.org/working_with_files-t115.html
-
-            writer = new CSVWriter(mFileWriter);
-        }
-        else {
-            try {
-                writer = new CSVWriter(new FileWriter(filePath));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //End of option 2
-        */
-
         //Link to layout
         AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
         AccelYValueView=(TextView)findViewById(R.id.AccelYcoordView);
@@ -151,20 +111,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             LightValueView.setText("Light: "+l);
         }
 
-        String[] data = {AccelXValueView.getText().toString(),
-                         AccelYValueView.getText().toString(),
-                         AccelZValueView.getText().toString(),
-                         GyroXValueView.getText().toString(),
-                         GyroYValueView.getText().toString(),
-                         GyroZValueView.getText().toString(),
-                         MagnetXValueView.getText().toString(),
-                         MagnetYValueView.getText().toString(),
-                         MagnetZValueView.getText().toString(),
-                         LightValueView.getText().toString()};
+        String data = AccelXValueView.getText().toString().substring(3) + "," +
+                         AccelYValueView.getText().toString().substring(3) + "," +
+                         AccelZValueView.getText().toString().substring(3) + "," +
+                         GyroXValueView.getText().toString().substring(3) + "," +
+                         GyroYValueView.getText().toString().substring(3) + "," +
+                         GyroZValueView.getText().toString().substring(3) + "," +
+                         MagnetXValueView.getText().toString().substring(3) + "," +
+                         MagnetYValueView.getText().toString().substring(3) + "," +
+                         MagnetZValueView.getText().toString().substring(3) + "," +
+                         LightValueView.getText().toString() + "/n";
 
-        if(ready) {
-            writer.writeNext(data);
-        }
     }
 
     @Override
