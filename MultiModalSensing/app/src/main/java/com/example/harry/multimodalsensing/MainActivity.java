@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private String baseFolder;
     private String exercise_type;
+    private String distance;
     private String filename;
     private String format = "dd-MM-yy HH:mm:ss";
     private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
@@ -61,16 +62,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.select_activity);
-
         mContext = getApplicationContext();
-
         exercise_type = null;
         startClicked = false;
+        distance = "0";
 
-        while(exercise_type.equals(null));
+        setContentView(R.layout.content_scrolling);
 
-        filename = exercise_type + sdf.format(new Date())/*.toString()*/ + "_0.csv";
+        //while(exercise_type==null);
+
+        if(!startClicked)
+            exercise_type = "IDLE";
+        filename = exercise_type + sdf.format(new Date())/*.toString()*/ + "_" + distance + ".csv";
         //file = new File(mContext.getFilesDir(), filename);
         //file.setReadable(true, false);
 
@@ -89,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             System.out.println("else case");
         }
 
-        while(!startClicked);
+        //while(!startClicked);
 
         setContentView(R.layout.content_scrolling);
         //Link to layout
