@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private String exercise_type;
     private String distance;
     private String filename;
-    private String format = "dd-MM-yy HH:mm:ss";
+    private String format = "dd-MM-yy_HH:mm:ss";
     private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
     private Context mContext;
     private File file;
@@ -73,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         if(!startClicked)
             exercise_type = "IDLE";
-        filename = exercise_type + sdf.format(new Date())/*.toString()*/ + "_" + distance + ".csv";
+        String tStampString = sdf.format(new Date());
+        filename = exercise_type + "_" + tStampString + "_" + distance + ".csv";
         //file = new File(mContext.getFilesDir(), filename);
         //file.setReadable(true, false);
 
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             //baseFolder = mContext.getExternalFilesDir(null).getAbsolutePath();
             path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             file = new File(path, filename);
-            path.mkdirs();
+            //path.mkdirs();
             System.out.println("if case");
         }
         //revert to internal storage
