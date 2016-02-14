@@ -1,7 +1,7 @@
 import csv
 from math import *
 
-datafile  = open('DDR_14-02-16_12_19_20_80800.csv', "rb")
+datafile  = open('WALKING_14-02-16_16-07-19_2430.csv', "rb")
 reader = csv.reader(datafile)
 
 e = []
@@ -15,7 +15,7 @@ for row in reader:
     colnum = 0
     for col in row:
         mod = colnum % 11
-        if list(col)[0] is 'e':
+        if list(col)[0] is 'n':
             pass
         elif mod is 0:
             time.append(col)
