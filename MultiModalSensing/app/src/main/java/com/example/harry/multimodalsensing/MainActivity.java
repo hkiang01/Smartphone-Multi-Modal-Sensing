@@ -44,15 +44,29 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView AccelYValueView;
     TextView AccelZValueView;
 
+    String AccelXValueString;
+    String AccelYValueString;
+    String AccelZValueString;
+
     TextView GyroXValueView;
     TextView GyroYValueView;
     TextView GyroZValueView;
+
+    String GyroXValueString;
+    String GyroYValueString;
+    String GyroZValueString;
 
     TextView MagnetXValueView;
     TextView MagnetYValueView;
     TextView MagnetZValueView;
 
+    String MagnetXValueString;
+    String MagnetYValueString;
+    String MagnetZValueString;
+
     TextView LightValueView;
+
+    String LightValueString;
 
     private String baseFolder;
     private String filename;
@@ -108,9 +122,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float y=event.values[1];
             float z=event.values[2];
 
-            AccelXValueView.setText("X: "+x);
-            AccelYValueView.setText("Y: "+y);
-            AccelZValueView.setText("Z: "+z);
+            if(liveDisplayMode) {
+                GyroXValueView.setText("X: " + x);
+                GyroYValueView.setText("Y: " + y);
+                GyroZValueView.setText("Z: " + z);
+            }
+            else {
+                GyroXValueString = Float.toString(x);
+                GyroYValueString = Float.toString(y);
+                GyroZValueString = Float.toString(z);
+            }
         }
 
         else if(event.sensor.getType()==Sensor.TYPE_GYROSCOPE) {
@@ -118,10 +139,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float y=event.values[1];
             float z=event.values[2];
 
-
-            GyroXValueView.setText("X: "+x);
-            GyroYValueView.setText("Y: "+y);
-            GyroZValueView.setText("Z: "+z);
+            if(liveDisplayMode) {
+                GyroXValueView.setText("X: " + x);
+                GyroYValueView.setText("Y: " + y);
+                GyroZValueView.setText("Z: " + z);
+            }
+            else {
+                GyroXValueString = Float.toString(x);
+                GyroYValueString = Float.toString(y);
+                GyroZValueString = Float.toString(z);
+            }
         }
 
         else if(event.sensor.getType()==Sensor.TYPE_MAGNETIC_FIELD) {
@@ -129,30 +156,60 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float y=event.values[1];
             float z=event.values[2];
 
-            MagnetXValueView.setText("X: "+x);
-            MagnetYValueView.setText("Y: "+y);
-            MagnetZValueView.setText("Z: "+z);
+            if(liveDisplayMode) {
+                MagnetXValueView.setText("X: "+x);
+                MagnetYValueView.setText("Y: "+y);
+                MagnetZValueView.setText("Z: "+z);
+            }
+            else {
+                MagnetXValueString = Float.toString(x);
+                MagnetYValueString = Float.toString(y);
+                MagnetZValueString = Float.toString(z);
+            }
         }
 
         else if(event.sensor.getType()==Sensor.TYPE_LIGHT) {
             float l=event.values[0];
 
-            LightValueView.setText("Light: "+l);
+            if(liveDisplayMode) {
+                LightValueView.setText("Light: " + l);
+            }
+            else {
+                LightValueString = Float.toString(l);
+            }
         }
 
         //row data entry
-        String data = sdfFine.format(new Date())/*.toString()*/ + "," + //timestamp
-                //.substring(3) to get rid of "X: "
-                AccelXValueView.getText().toString().substring(3) + "," +
-                AccelYValueView.getText().toString().substring(3)  + "," +
-                AccelZValueView.getText().toString().substring(3) + "," +
-                GyroXValueView.getText().toString().substring(3) + "," +
-                GyroYValueView.getText().toString().substring(3) + "," +
-                GyroZValueView.getText().toString().substring(3) + "," +
-                MagnetXValueView.getText().toString().substring(3) + "," +
-                MagnetYValueView.getText().toString().substring(3) + "," +
-                MagnetZValueView.getText().toString().substring(3) + "," +
-                LightValueView.getText().toString().substring(7) + "\n";
+        String data;
+
+        if(liveDisplayMode) {
+            data = sdfFine.format(new Date())/*.toString()*/ + "," + //timestamp
+                    //.substring(3) to get rid of "X: "
+                    AccelXValueView.getText().toString().substring(3) + "," +
+                    AccelYValueView.getText().toString().substring(3) + "," +
+                    AccelZValueView.getText().toString().substring(3) + "," +
+                    GyroXValueView.getText().toString().substring(3) + "," +
+                    GyroYValueView.getText().toString().substring(3) + "," +
+                    GyroZValueView.getText().toString().substring(3) + "," +
+                    MagnetXValueView.getText().toString().substring(3) + "," +
+                    MagnetYValueView.getText().toString().substring(3) + "," +
+                    MagnetZValueView.getText().toString().substring(3) + "," +
+                    LightValueView.getText().toString().substring(7) + "\n";
+        }
+        else {
+            data = sdfFine.format(new Date())/*.toString()*/ + "," + //timestamp
+                    //.substring(3) to get rid of "X: "
+                    AccelXValueString + "," +
+                    AccelYValueString + "," +
+                    AccelZValueString + "," +
+                    GyroXValueString + "," +
+                    GyroYValueString + "," +
+                    GyroZValueString + "," +
+                    MagnetXValueString + "," +
+                    MagnetYValueString + "," +
+                    MagnetZValueString + "," +
+                    LightValueString + "\n";
+        }
 
         //write to file
         try{
