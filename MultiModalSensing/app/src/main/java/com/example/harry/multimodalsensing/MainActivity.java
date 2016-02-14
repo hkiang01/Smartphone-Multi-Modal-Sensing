@@ -5,11 +5,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -53,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView LightValueView;
 
     private String baseFolder;
-    private String exercise_type;
-    private String distance;
     private String filename;
     private String format = "dd-MM-yy_HH:mm:ss";
     private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
@@ -62,6 +62,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private File file;
     private File path;
     private FileWriter fWriter;
+    private File newFile;
+
+    private String exercise_type;
+
+    private String distance;
+    private NumberPicker numberPicker;
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+
     public void startButtonClick(View view) {
 
         //Change to data view
@@ -252,10 +260,73 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 SensorManager.SENSOR_DELAY_NORMAL);
     }
 
+    protected void getUserDistanceInput() {
+
+        //Bring numberpicker into view
+        setContentView(R.layout.distance_user_input);
+
+        //Retrieve numberpicker object
+        numberPicker = (NumberPicker)findViewById(R.id.numberPicker);
+        numberPicker.setMinValue(0);
+        numberPicker.setMaxValue(100000); //1km = 100000cm
+        numberPicker.setWrapSelectorWheel(false); //no wrapping
+        numberPicker.setOnLongPressUpdateInterval(100); //default is 300
+
+        //listen for change of value of numberPicker
+        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+
+                //set the distance
+                distance = String.valueOf(newVal);
+                System.out.println("Distance: " + distance);
+            }
+        });
+    }
+
     public void stopButtonClick(View view) {
 
         //stop sensors
         sensorManager.unregisterListener(this);
+
+        if(!exercise_type.equals("IDLE")) {
+            //gets user input distance
+            getUserDistanceInput();
+        }
+        else {
+            //get ready for next activity
+            setContentView(R.layout.select_activity);
+        }
+    }
+
+    public void renameFile(View view) {
+
+        //Change file name
+        System.out.println("Old file name: " + filename);
+        System.out.println("Read Distance: " + distance);
+        String newFileName = filename.substring(0, filename.length()-5) + distance + ".csv";
+        System.out.println("New file name: " + newFileName);
+
+        //check if external storage is available
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            newFile = new File(path, newFileName);
+        }
+        //revert to internal storage
+        else {
+            baseFolder = mContext.getFilesDir().getAbsolutePath();
+            newFile = new File(baseFolder + newFileName);
+        }
+
+        //if(file.exists() && newFile.exists()) {
+        if(file.exists()) {
+            file.renameTo(newFile);
+            file.setReadable(true);
+            file.setWritable(true);
+        }
+        else {
+            System.out.println("Unable to rename file");
+        }
 
         //prepare for another activity
         setContentView(R.layout.select_activity);
