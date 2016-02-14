@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -27,10 +28,15 @@ import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
+
     private SensorManager sensorManager;
-    private FileWriter mFileWriter;
-    private CSVWriter writer;
-    private boolean ready = false;
+
+    RadioButton radioButtonWalking;
+    RadioButton radioButtonRunning;
+    RadioButton radioButtonIdle;
+    RadioButton radioButtonStairs;
+    RadioButton radioButtonJumping;
+    RadioButton radioButtonDDR;
 
     TextView AccelXValueView;
     TextView AccelYValueView;
@@ -54,77 +60,34 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
     private Context mContext;
     private File file;
-    private FileOutputStream fos;
     private File path;
     private FileWriter fWriter;
-    private boolean startClicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getApplicationContext();
         exercise_type = null;
-        startClicked = false;
         distance = "0";
 
-        setContentView(R.layout.content_scrolling);
+        setContentView(R.layout.select_activity);
 
-        //while(exercise_type==null);
+        //Link radio buttons to layout
+        radioButtonWalking = (RadioButton)findViewById(R.id.radio_walking);
+        radioButtonRunning = (RadioButton)findViewById(R.id.radio_running);
+        radioButtonIdle = (RadioButton)findViewById(R.id.radio_idle);
+        radioButtonStairs = (RadioButton)findViewById(R.id.radio_stairs);
+        radioButtonJumping = (RadioButton)findViewById(R.id.radio_jumping);
+        radioButtonDDR = (RadioButton)findViewById(R.id.radio_ddr);
 
-        if(!startClicked)
-            exercise_type = "IDLE";
-        String tStampString = sdf.format(new Date());
-        filename = exercise_type + "_" + tStampString + "_" + distance + ".csv";
-        //file = new File(mContext.getFilesDir(), filename);
-        //file.setReadable(true, false);
+        //Set radio button text
+        radioButtonWalking.setText("Walking");
+        radioButtonRunning.setText("Running");
+        radioButtonIdle.setText("Idle");
+        radioButtonStairs.setText("Stairs");
+        radioButtonJumping.setText("Jumping");
+        radioButtonDDR.setText("DDR");
 
-        //check if external storage is available
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            //baseFolder = mContext.getExternalFilesDir(null).getAbsolutePath();
-            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            file = new File(path, filename);
-            //path.mkdirs();
-            System.out.println("if case");
-        }
-        //revert to internal storage
-        else {
-            baseFolder = mContext.getFilesDir().getAbsolutePath();
-            file = new File(baseFolder + filename);
-            System.out.println("else case");
-        }
-
-        //while(!startClicked);
-
-        setContentView(R.layout.content_scrolling);
-        //Link to layout
-        AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
-        AccelYValueView=(TextView)findViewById(R.id.AccelYcoordView);
-        AccelZValueView=(TextView)findViewById(R.id.AccelZcoordView);
-        GyroXValueView=(TextView)findViewById(R.id.GyroXcoordView);
-        GyroYValueView=(TextView)findViewById(R.id.GyroYcoordView);
-        GyroZValueView=(TextView)findViewById(R.id.GyroZcoordView);
-        MagnetXValueView=(TextView)findViewById(R.id.MagnetXcoordView);
-        MagnetYValueView=(TextView)findViewById(R.id.MagnetYcoordView);
-        MagnetZValueView=(TextView)findViewById(R.id.MagnetZcoordView);
-        LightValueView=(TextView)findViewById(R.id.LightcoordView);
-
-        sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
-
-        sensorManager.registerListener(this,
-                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
-
-        sensorManager.registerListener(this,
-                sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                SensorManager.SENSOR_DELAY_NORMAL);
-
-        sensorManager.registerListener(this,
-                sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_NORMAL);
-
-        sensorManager.registerListener(this,
-                sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-                SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -180,16 +143,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 MagnetZValueView.getText().toString().substring(3) + "," +
                 LightValueView.getText().toString().substring(7) + "\n";
 
-        /*
-        try{
-            fos = openFileOutput(filename, Context.MODE_PRIVATE);
-            fos.write(data.getBytes());
-            fos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        */
-
+        //write to file
         try{
             fWriter = new FileWriter(file, true);
             fWriter.write(data);
@@ -240,12 +194,70 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void startButtonClick(View view) {
-        startClicked = true;
+
+        //Change to data view
+        setContentView(R.layout.content_scrolling);
+
+        //Timestamp
+        String tStampString = sdf.format(new Date());
+
+        //Default activity
+        if(exercise_type.isEmpty())
+            exercise_type = "IDLE";
+
+        filename = exercise_type + "_" + tStampString + "_" + distance + ".csv";
+
+        //check if external storage is available
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            file = new File(path, filename);
+        }
+        //revert to internal storage
+        else {
+            baseFolder = mContext.getFilesDir().getAbsolutePath();
+            file = new File(baseFolder + filename);
+        }
+
+        //Link to layout
+        AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
+        AccelYValueView=(TextView)findViewById(R.id.AccelYcoordView);
+        AccelZValueView=(TextView)findViewById(R.id.AccelZcoordView);
+        GyroXValueView=(TextView)findViewById(R.id.GyroXcoordView);
+        GyroYValueView=(TextView)findViewById(R.id.GyroYcoordView);
+        GyroZValueView=(TextView)findViewById(R.id.GyroZcoordView);
+        MagnetXValueView=(TextView)findViewById(R.id.MagnetXcoordView);
+        MagnetYValueView=(TextView)findViewById(R.id.MagnetYcoordView);
+        MagnetZValueView=(TextView)findViewById(R.id.MagnetZcoordView);
+        LightValueView=(TextView)findViewById(R.id.LightcoordView);
+
+        //Register sensor manager
+        sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
+
+        //Register sensor manager sensros
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
+                SensorManager.SENSOR_DELAY_NORMAL);
+
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                SensorManager.SENSOR_DELAY_NORMAL);
+
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
+                SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void stopButtonClick(View view) {
+
+        //stop sensors
         sensorManager.unregisterListener(this);
 
+        //prepare for another activity
+        setContentView(R.layout.select_activity);
     }
 
 }
