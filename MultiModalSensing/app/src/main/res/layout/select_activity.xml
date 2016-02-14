@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.harry.multimodalsensing.MainActivity">
+
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/select_activity_radiogroup"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <RadioButton android:id="@+id/radio_walking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Walking"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_running"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Running"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_idle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Idle"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_stairs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stairs"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_jumping"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jumping"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_ddr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DDR"
+            android:onClick="onRadioButtonClicked"/>
+    </RadioGroup>
+    <Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/button_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:textSize="@dimen/stopbutton_size"
+        android:onClick="startButtonClick"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="44dp"
+        android:layout_below="@+id/select_activity_radiogroup"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>
