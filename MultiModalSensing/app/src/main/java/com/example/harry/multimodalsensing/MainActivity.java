@@ -57,7 +57,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private String baseFolder;
     private String filename;
     private String format = "dd-MM-yy_HH:mm:ss";
+    private String timestampFineFormat = "dd-MM-yy_HH:mm:ss:SSS";
     private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
+    private SimpleDateFormat sdfFine = new SimpleDateFormat(timestampFineFormat, Locale.US);
     private Context mContext;
     private File file;
     private File path;
@@ -68,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private String distance;
     private NumberPicker numberPicker;
-    private Location location;
+
+    private boolean liveDisplayMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float y=event.values[1];
             float z=event.values[2];
 
+
             GyroXValueView.setText("X: "+x);
             GyroYValueView.setText("Y: "+y);
             GyroZValueView.setText("Z: "+z);
@@ -137,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         //row data entry
-        String data = sdf.format(new Date())/*.toString()*/ + "," + //timestamp
+        String data = sdfFine.format(new Date())/*.toString()*/ + "," + //timestamp
                 //.substring(3) to get rid of "X: "
                 AccelXValueView.getText().toString().substring(3) + "," +
                 AccelYValueView.getText().toString().substring(3)  + "," +
@@ -239,25 +243,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         MagnetZValueView=(TextView)findViewById(R.id.MagnetZcoordView);
         LightValueView=(TextView)findViewById(R.id.LightcoordView);
 
+
         //Register sensor manager
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
 
         //Register sensor manager sensros
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     protected void getUserDistanceInput() {
