@@ -205,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(exercise_type.isEmpty())
             exercise_type = "IDLE";
 
+        //name the file
         filename = exercise_type + "_" + tStampString + "_" + distance + ".csv";
 
         //check if external storage is available
