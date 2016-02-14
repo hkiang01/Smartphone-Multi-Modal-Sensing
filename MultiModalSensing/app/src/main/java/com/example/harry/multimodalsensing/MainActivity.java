@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mContext = getApplicationContext();
         exercise_type = null;
         distance = "0";
+        liveDisplayMode = false;
 
         setContentView(R.layout.select_activity);
 
@@ -123,14 +124,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float z=event.values[2];
 
             if(liveDisplayMode) {
-                GyroXValueView.setText("X: " + x);
-                GyroYValueView.setText("Y: " + y);
-                GyroZValueView.setText("Z: " + z);
+                AccelXValueView.setText("X: " + x);
+                AccelYValueView.setText("Y: " + y);
+                AccelZValueView.setText("Z: " + z);
             }
             else {
-                GyroXValueString = Float.toString(x);
-                GyroYValueString = Float.toString(y);
-                GyroZValueString = Float.toString(z);
+                AccelXValueString = Float.toString(x);
+                AccelYValueString = Float.toString(y);
+                AccelZValueString = Float.toString(z);
             }
         }
 
