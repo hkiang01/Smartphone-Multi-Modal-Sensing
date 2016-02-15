@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mContext = getApplicationContext();
         exercise_type = null;
         distance = "0";
-        liveDisplayMode = false;
+        liveDisplayMode = true;
 
         setContentView(R.layout.select_activity);
 

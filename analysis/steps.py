@@ -36,8 +36,8 @@ datafile.close()
 
 steps = 0;
 for a, b in zip(e, e[1:]):
-    if a >= 0 and b <= 0:
-        steps += 1
+    if a >= 0 and b <= 0 and a>=0.10 and b <= -0.10:
+       steps += 1
 print steps;
 
 
