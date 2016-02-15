@@ -99,7 +99,10 @@ for activity in all_activities:
             medians = np.append(medians, np.median(elem))
             means = np.append(means, np.mean(elem))
             variances = np.append(variances, np.var(elem))
-            maxes = np.append(maxes, np.max(elem))
+            try:
+		maxes = np.append(maxes, np.max(elem))
+            except ValueError: #if elem is empty
+		pass
             zero_crossings = np.append(zero_crossings, np.prod(np.where(np.diff(np.sign(elem)))[0].shape))
         analyzed_data.append([medians, means, variances, maxes, zero_crossings])
         medians = np.array([])
