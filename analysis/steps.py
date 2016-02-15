@@ -1,7 +1,10 @@
 import csv
 from math import *
+import sys
 
-datafile  = open('WALKING_14-02-16_16-07-19_2430.csv', "rb")
+args = sys.argv
+#datafile  = open('WALKING_14-02-16_16-07-19_2430.csv', "rb")
+datafile = open(str(args[1]), "rb")
 reader = csv.reader(datafile)
 
 e = []
