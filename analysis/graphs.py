@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+
+#dx = fig.add_subplot(1,2,4, projection='3d')
 
 datafile  = open('WALKING_14-02-16_16-07-19_2430.csv', "rb")
 
@@ -102,11 +102,27 @@ for chunk in chunked_data:
     variances = np.array([])
     #zero_crossings = np.array([])
 
-ax.scatter(analyzed_data[0][0], analyzed_data[1][0], analyzed_data[2][0], zdir='z', s=20, c='b')
+fig1 = plt.figure()
+ax = fig1.add_subplot(111, projection='3d')
+ax.scatter(analyzed_data[0][3], analyzed_data[1][3], analyzed_data[2][3], zdir='z', s=20, c='b')
+ax.set_title('Walking, Accelerometer, Variance')
+plt.savefig('plots/fig1.png')
 
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
+fig2 = plt.figure()
+bx = fig2.add_subplot(111, projection='3d')
+bx.scatter(analyzed_data[0][1], analyzed_data[1][1], analyzed_data[2][1], zdir='z', s=20, c='b')
+bx.set_title('Walking, Accelerometer, Medians')
+plt.savefig('plots/fig2.png')
 
-plt.show()
+fig3 = plt.figure()
+cx = fig3.add_subplot(111, projection='3d')
+cx.scatter(analyzed_data[0][2], analyzed_data[1][2], analyzed_data[2][2], zdir='z', s=20, c='b')
+cx.set_title('Walking, Accelerometer, Maxima')
+plt.savefig('plots/fig3.png')
+
+fig4 = plt.figure()
+cx = fig4.add_subplot(111, projection='3d')
+cx.scatter(analyzed_data[0][0], analyzed_data[1][0], analyzed_data[2][0], zdir='z', s=20, c='b')
+cx.set_title('Walking, Accelerometer, Means')
+plt.savefig('plots/fig4.png')
 
