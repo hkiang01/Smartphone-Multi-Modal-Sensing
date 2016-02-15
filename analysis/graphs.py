@@ -11,9 +11,6 @@ datafile  = open('WALKING_14-02-16_16-07-19_2430.csv', "rb")
 
 reader = csv.reader(datafile)
 
-e = []
-time = []
-
 accelX = np.array([])
 accelY = np.array([])
 accelZ = np.array([])
@@ -31,31 +28,35 @@ variances = np.array([])
 zero_crossings = np.array([])
 
 sliced_data = []
-
-x = 0
-y = 0
-z = 0
-
 timestamps = np.array([])
 
-#Cleanup the CVS file first, get rid of null data
+interval = int((next(reader)[0])[-3:-2])
+reader = csv.reader(datafile)
 
-
-
-
-interval = int((next(reader)[0])[-3])
 rownum = 0
 for row in reader:
     colnum = 0
     for col in row:
         mod = colnum % 11
-        curr_ms = col[-3]
         if mod is 0:
-            if curr_ms is interval + 2:
+            next_thing = (interval + 2) % 10
+            number = int(col[-3:-2])
+            if number is next_thing:
                 interval = (interval + 2) % 10
                 chunk = [accelX, accelY, accelZ, gyroX, gyroY, gyroZ, magX, magY, magZ, light]
                 timestamps = np.append(timestamps, col)
                 sliced_data.append(chunk)
+                accelX = np.array([])
+                accelY = np.array([])
+                accelZ = np.array([])
+                gyroX = np.array([])
+                gyroY = np.array([])
+                gyroZ = np.array([])
+                magX = np.array([])
+                magY = np.array([])
+                magZ = np.array([])
+                light = np.array([])
+                chunk = []
         if list(col)[0] is 'n':
             pass
         elif mod is 1:
@@ -90,12 +91,16 @@ one_sensor_column = []
 for chunk in chunked_data:
     for elem in chunk:
         medians = np.append(medians, np.median(elem))
-        print medians
         means = np.append(means, np.mean(elem))
-        variances = np.append(variances, np.variance(elem))
+        variances = np.append(variances, np.var(elem))
         maxes = np.append(maxes, np.max(elem))
-      #  zero_crossings = np.append(zero_crossings, np.where(np.diff(np.sign(elem)))[0].shape
+        #zero_crossings = np.prod((np.append(zero_crossings, np.where(np.diff(np.sign(elem)))[0]).shape)
     analyzed_data.append([medians, means, variances, maxes])
+    medians = np.array([])
+    means = np.array([])
+    maxes = np.array([])
+    variances = np.array([])
+    #zero_crossings = np.array([])
 
 ax.scatter(analyzed_data[0][0], analyzed_data[1][0], analyzed_data[2][0], zdir='z', s=20, c='b')
 
@@ -104,3 +109,4 @@ ax.set_ylabel('Y Label')
 ax.set_zlabel('Z Label')
 
 plt.show()
+
