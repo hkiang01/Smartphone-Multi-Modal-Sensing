@@ -216,7 +216,7 @@ for a in xrange(len(sensor_names)):
                         #print curr_pair
                         #sys.exit(0)
 # settings associated with greatest avg distance between clusters
-for q_elem in q:
+while !q.empty():
     best_pair = q.get()
     a = best_pair[1][0]
     b = best_pair[1][1]
