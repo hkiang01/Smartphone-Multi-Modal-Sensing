@@ -14,8 +14,9 @@
 
   - See analysis/steps.py
   
-  - Algorithm: At a zero crossing of the Accel.x, observe adjacent data points a,b where
-  a and b are of opposite signs. If a and b both have a magnitude above a threshold, it's a step
+  - Algorithm: We compute sqrt(Accel.x^2 + Accel.y^2 + Accel.z^2) - 9.81, to compute the Energy in a
+    given step in time. Then, we observe adjacent data points a,b where a and b are of opposite signs. 
+    If a and b both have a magnitude above a threshold, it counts as a step
   
 ###Stage 4:
 
