@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import math
+import sys
+import scipy.spatial.distance as distance
+try:
+    import Queue as Q
+except ImportError:
+    import queue as Q
 
 #dx = fig.add_subplot(1,2,4, projection='3d')
 
@@ -137,14 +143,50 @@ activity_names = ['WALKING', 'RUNNING', 'JUMPING', 'IDLE', 'STAIRS']
 sensor_names = ['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', 'MagnetX', 'MagnetY', 'MagnetZ', 'Light']
 feature_names = ['Mean', 'Median', 'Maxima', 'Variance', 'Zero Crossings']
 
-a = 0
-b = 3
-c = 5
-d = 0
-e = 2
-f = 4
+# a = 0
+# b = 3
+# c = 5
+# d = 0
+# e = 2
+# f = 4
 
-figCounter = 1
+# figCounter = 1
+# for a in xrange(len(sensor_names)):
+#     for b in xrange(len(feature_names)):
+#         for c in xrange(len(sensor_names)):
+#             for d in xrange(len(feature_names)):
+#                 if(a==c and b==d):
+#                     continue
+#                 for e in xrange(len(sensor_names)):
+#                     for f in xrange(len(feature_names)):
+#                         if((e==a and f==b) or (e==c and f==d)):
+#                             continue
+#                         myfig = plt.figure(figsize=(20,15))
+#                         myx = myfig.add_subplot(111, projection='3d')
+#                         try:
+#                             myx.scatter(plotit[0][a][b], plotit[0][c][d], plotit[0][e][f], zdir='z', s=15, c='b', label=activity_names[0])
+#                         except ValueError:
+#                             continue
+#                         myx.scatter(plotit[1][a][b], plotit[1][c][d], plotit[1][e][f], zdir='z', s=15, c='r', label=activity_names[1])
+#                         myx.scatter(plotit[2][a][b], plotit[2][c][d], plotit[2][e][f], zdir='z', s=15, c='g', label=activity_names[2])
+#                         myx.scatter(plotit[3][a][b], plotit[3][c][d], plotit[3][e][f], zdir='z', s=15, c='k', label=activity_names[3])
+#                         myx.scatter(plotit[4][a][b], plotit[4][c][d], plotit[4][e][f], zdir='z', s=15, c='c', label=activity_names[4])
+#                         myx.legend(loc='upper left', prop={'size':20})
+#                         myTitle = 'All Activities: ' + sensor_names[a] + '_' + feature_names[b] + ' vs ' + sensor_names[c] + '_' + feature_names[d] + ' vs ' + sensor_names[e] + '_' + feature_names[f];
+#                         myx.set_title(myTitle)
+#                         #plt.savefig('plots/fig' + str(figCounter))
+#                         plt.savefig('plots/' + myTitle)
+#                         #plt.show()
+#                         plt.clf()
+#                         plt.close()
+#                         figCounter+=1;
+
+
+# cluster points associated with each activity
+# get average distance between cluster centroids
+# goal: get settings associated with greatest avg distance between clusters
+q = Q.PriorityQueue()
+
 for a in xrange(len(sensor_names)):
     for b in xrange(len(feature_names)):
         for c in xrange(len(sensor_names)):
@@ -153,28 +195,53 @@ for a in xrange(len(sensor_names)):
                     continue
                 for e in xrange(len(sensor_names)):
                     for f in xrange(len(feature_names)):
-                        # if((e==a and f==b) or (e==c and f==d)):
-                        #     continue
-                        myfig = plt.figure(figsize=(20,15))
-                        myx = myfig.add_subplot(111, projection='3d')
-                        try:
-                            myx.scatter(plotit[0][a][b], plotit[0][c][d], plotit[0][e][f], zdir='z', s=15, c='b', label=activity_names[0])
-                        except ValueError:
+                        if((e==a and f==b) or (e==c and f==d)):
                             continue
-                        myx.scatter(plotit[1][a][b], plotit[1][c][d], plotit[1][e][f], zdir='z', s=15, c='r', label=activity_names[1])
-                        myx.scatter(plotit[2][a][b], plotit[2][c][d], plotit[2][e][f], zdir='z', s=15, c='g', label=activity_names[2])
-                        myx.scatter(plotit[3][a][b], plotit[3][c][d], plotit[3][e][f], zdir='z', s=15, c='k', label=activity_names[3])
-                        myx.scatter(plotit[4][a][b], plotit[4][c][d], plotit[4][e][f], zdir='z', s=15, c='c', label=activity_names[4])
-                        myx.legend(loc='upper left', prop={'size':20})
-                        myTitle = 'All Activities: ' + sensor_names[a] + '_' + feature_names[b] + ' vs ' + sensor_names[c] + '_' + feature_names[d] + ' vs ' + sensor_names[e] + '_' + feature_names[f];
-                        myx.set_title(myTitle)
-                        #plt.savefig('plots/fig' + str(figCounter))
-                        plt.savefig('plots/' + myTitle)
-                        #plt.show()
-                        plt.clf()
-                        plt.close()
-                        figCounter+=1;
+                        avgs = []
+                        for act in xrange(len(activity_names)):
+                            x = plotit[act][a][b]
+                            y = plotit[act][c][d]
+                            z = plotit[act][e][f]
+                            centroid = [sum(x)/len(x), sum(y)/len(y), sum(x)/len(z)]
+                            avgs.append(centroid)
+                        npavgs = np.asarray(avgs)
+                        # for avg in npavgs:
+                        #     print avg
+                        dist = distance.pdist(npavgs)
+                        dist = -dist
+                        curr_avg = np.average(dist)
+                        params = [a,b,c,d,e,f]
+                        curr_pair = (curr_avg, params)
+                        q.put(curr_pair)
+                        #print curr_pair
+                        #sys.exit(0)
+# settings associated with greatest avg distance between clusters
+for q_elem in q:
+    best_pair = q.get()
+    a = best_pair[1][0]
+    b = best_pair[1][1]
+    c = best_pair[1][2]
+    d = best_pair[1][3]
+    e = best_pair[1][4]
+    f = best_pair[1][5]
 
+    # figure according to settings associated with greatest avg distance between clusters
+    myfig = plt.figure(figsize=(20,15))
+    myx = myfig.add_subplot(111, projection='3d')
+    myx.scatter(plotit[0][a][b], plotit[0][c][d], plotit[0][e][f], zdir='z', s=15, c='b', label=activity_names[0])
+    myx.scatter(plotit[1][a][b], plotit[1][c][d], plotit[1][e][f], zdir='z', s=15, c='r', label=activity_names[1])
+    myx.scatter(plotit[2][a][b], plotit[2][c][d], plotit[2][e][f], zdir='z', s=15, c='g', label=activity_names[2])
+    myx.scatter(plotit[3][a][b], plotit[3][c][d], plotit[3][e][f], zdir='z', s=15, c='k', label=activity_names[3])
+    myx.scatter(plotit[4][a][b], plotit[4][c][d], plotit[4][e][f], zdir='z', s=15, c='c', label=activity_names[4])
+    myx.legend(loc='upper left', prop={'size':20})
+    myTitle = 'All Activities: ' + sensor_names[a] + '_' + feature_names[b] + ' vs ' + sensor_names[c] + '_' + feature_names[d] + ' vs ' + sensor_names[e] + '_' + feature_names[f];
+    myx.set_title(myTitle)
+    #plt.savefig('plots/fig' + str(figCounter))
+    plt.savefig('plots/' + myTitle)
+    plt.show()
+    plt.clf()
+    plt.close()
+                        
 # fig1 = plt.figure()
 # ax = fig1.add_subplot(111, projection='3d')
 # ax.scatter(plotit[0][0][0], plotit[0][1][0], plotit[0][2][0], zdir='z', s=15, c='b', label=activity_names[0])
