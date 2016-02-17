@@ -130,32 +130,50 @@ for activity in all_activities:
 #       1: medians
 #       2: maxima
 #       3: variances
-#
+#       4: zero crossings
 #
 
 activity_names = ['WALKING', 'RUNNING', 'JUMPING', 'IDLE', 'STAIRS']
 sensor_names = ['AccX', 'AccY', 'AccZ', 'GyroX', 'GyroY', 'GyroZ', 'MagnetX', 'MagnetY', 'MagnetZ', 'Light']
-feature_names = ['Mean', 'Median', 'Maxima', 'Variance']
+feature_names = ['Mean', 'Median', 'Maxima', 'Variance', 'Zero Crossings']
 
 a = 0
-b = 0
-c = a+1
+b = 3
+c = 5
 d = 0
-e = c+1
-f = 0
+e = 2
+f = 4
 
-myfig = plt.figure()
-myx = myfig.add_subplot(111, projection='3d')
-myx.scatter(plotit[0][a][b], plotit[0][c][d], plotit[0][e][f], zdir='z', s=15, c='b', label=activity_names[0])
-myx.scatter(plotit[1][a][b], plotit[1][c][d], plotit[1][e][f], zdir='z', s=15, c='r', label=activity_names[1])
-myx.scatter(plotit[2][a][b], plotit[2][c][d], plotit[2][e][f], zdir='z', s=15, c='g', label=activity_names[2])
-myx.scatter(plotit[3][a][b], plotit[3][c][d], plotit[3][e][f], zdir='z', s=15, c='k', label=activity_names[3])
-myx.scatter(plotit[4][a][b], plotit[4][c][d], plotit[4][e][f], zdir='z', s=15, c='c', label=activity_names[4])
-myx.legend(loc='upper left', prop={'size':6})
-myx.set_title('All Activities\n' + sensor_names[a] + '_' + feature_names[b]
-                + ' vs ' + sensor_names[c] + '_' + feature_names[d]
-                + ' vs ' + sensor_names[e] + '_' + feature_names[f])
-plt.show()
+figCounter = 1
+for a in xrange(len(sensor_names)):
+    for b in xrange(len(feature_names)):
+        for c in xrange(len(sensor_names)):
+            for d in xrange(len(feature_names)):
+                if(a==c and b==d):
+                    continue
+                for e in xrange(len(sensor_names)):
+                    for f in xrange(len(feature_names)):
+                        # if((e==a and f==b) or (e==c and f==d)):
+                        #     continue
+                        myfig = plt.figure(figsize=(20,15))
+                        myx = myfig.add_subplot(111, projection='3d')
+                        try:
+                            myx.scatter(plotit[0][a][b], plotit[0][c][d], plotit[0][e][f], zdir='z', s=15, c='b', label=activity_names[0])
+                        except ValueError:
+                            continue
+                        myx.scatter(plotit[1][a][b], plotit[1][c][d], plotit[1][e][f], zdir='z', s=15, c='r', label=activity_names[1])
+                        myx.scatter(plotit[2][a][b], plotit[2][c][d], plotit[2][e][f], zdir='z', s=15, c='g', label=activity_names[2])
+                        myx.scatter(plotit[3][a][b], plotit[3][c][d], plotit[3][e][f], zdir='z', s=15, c='k', label=activity_names[3])
+                        myx.scatter(plotit[4][a][b], plotit[4][c][d], plotit[4][e][f], zdir='z', s=15, c='c', label=activity_names[4])
+                        myx.legend(loc='upper left', prop={'size':20})
+                        myTitle = 'All Activities: ' + sensor_names[a] + '_' + feature_names[b] + ' vs ' + sensor_names[c] + '_' + feature_names[d] + ' vs ' + sensor_names[e] + '_' + feature_names[f];
+                        myx.set_title(myTitle)
+                        #plt.savefig('plots/fig' + str(figCounter))
+                        plt.savefig('plots/' + myTitle)
+                        #plt.show()
+                        plt.clf()
+                        plt.close()
+                        figCounter+=1;
 
 # fig1 = plt.figure()
 # ax = fig1.add_subplot(111, projection='3d')
