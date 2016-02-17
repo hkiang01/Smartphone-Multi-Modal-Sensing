@@ -30,3 +30,5 @@
   - Acquire the best 3 [sensorcol][feature] pairs for classification using a heap
   
   - Generate the relevant graph, the 20 best of which are located in analysis/plots directory
+
+  - Best: All Activities: AccY_Variance vs Light_Maxima vs AccX_Mean.png
