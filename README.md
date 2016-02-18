@@ -3,17 +3,19 @@
 
 ### Harrrison Kiang (hkiang2) and Sara Akgul (akgul1)
 
-###Stage 1:
+###Stage 1 (Android app):
   
-  - See MultiModalSensing/app/src/main/java/com/example/harry/multimodalsensing/MainActivity.java
+  - For main code, ee MultiModalSensing/app/src/main/java/com/example/harry/multimodalsensing/MainActivity.java
   
+  - For views, see MultiModalSensing/app/src/main/res/layout/
+
   - This stores in the 'Downloads' folder of Android OS the relevant CSV file
   
-###Stage 2:
+###Stage 2 (sample CSV files from app):
   
   - See analysis directory, the location for sample CSV's
   
-###Stage 3:
+###Stage 3 (step algorithm):
 
   - See analysis/steps.py
   
@@ -21,7 +23,7 @@
     given step in time. Then, we observe adjacent data points a,b where a and b are of opposite signs. 
     If a and b both have a magnitude above a threshold, it counts as a step
   
-###Stage 4:
+###Stage 4 (3D plotting):
 
   - See analysis/graphs.py
   
