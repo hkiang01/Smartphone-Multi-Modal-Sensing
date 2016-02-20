@@ -1,5 +1,5 @@
 ## ECE/CS 498: Mobile Sensing, Computing, and Applications
-## Programming Assignment 1: Exploring Multi-Modal Sensing on Smartphones
+## [Programming Assignment 1: Exploring Multi-Modal Sensing on Smartphones](https://courses.engr.illinois.edu/ece498rc4/slides/PA1_ece498rr.pdf)
 
 ### Harrrison Kiang (hkiang2) and Sara Akgul (akgul1)
 
