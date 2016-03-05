@@ -1,15 +1,27 @@
 package com.example.harry.multimodalsensing2;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.opencsv.CSVWriter;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,8 +30,9 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
 
-    private double STEP_LENGTH = 1.0d; //in units
-    private boolean liveDisplayMode = true;
+    private double STEP_LENGTH = 1.0d; //in units as in PA spec
+    private boolean logMode = false;
+    private boolean logAnyways = false; //for debugging
 
     private SensorManager sensorManager;
     String mBearing;
@@ -61,14 +74,39 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     float lightValue = 0.0f;
     TextView LightValueView;
+
+
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    private String baseFolder;
+    private String format = "dd-MM-yy_HH:mm:ss";
     private String timestampFineFormat = "dd-MM-yy_HH:mm:ss:SSS";
+    private SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
     private SimpleDateFormat sdfFine = new SimpleDateFormat(timestampFineFormat, Locale.US);
-    String data = "";
+    private Context mContext;
+    private File file;
+    private File path;
+    private FileWriter fWriter;
+    private File newFile;
+    private FileOutputStream fos;
+
+    private String baseDir;
+    private String fileName;
+    private String filePath;
+    private File f;
+    private FileWriter mFileWriter;
+    private CSVWriter writer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = getApplicationContext();
         setContentView(R.layout.activity_main);
+        verifyStoragePermissions(this);
 
         //Register sensor manager
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
@@ -103,6 +141,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         BearingValueView=(TextView)findViewById(R.id.BearingView);
         DisplacementValueView=(TextView)findViewById(R.id.DisplacementView);
         TotalRotationValueView=(TextView)findViewById(R.id.TotalRotationView);
+
+        path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        fileName = "ACTIVITY_" + sdfFine.format(new Date()) + ".csv";
+        file = new File(path, fileName);
+        if(!file.exists()) {
+            logMode = true;
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("File: " + file.getAbsolutePath());
+        }
+        else {
+            System.out.println("Failed to create file!");
+        }
+        //file.setWritable(true, false);
+        file.setReadable(true, false);
     }
 
     @Override
@@ -188,20 +244,57 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         //row data entry
-        if(liveDisplayMode) {
-            data = sdfFine.format(new Date())/*.toString()*/ + "," + //timestamp
-                    //.substring(3) to get rid of "X: "
-                    accelX + "," + accelY + "," + accelZ + "," +
-                    gyroX + "," + gyroY + "," + gyroZ + "," +
-                    magnetX + "," + magnetY + "," + magnetZ + "," +
-                    lightValue + "," +
-                    currDisplacement + "," +
-                    totalRotationDegrees + "," +
+        if(logMode || logAnyways) {
+
+            /*
+           String[] data = {sdfFine.format(new Date()), //timestamp
+                    Float.toString(accelX), Float.toString(accelY), Float.toString(accelZ),
+                    Float.toString(gyroX), Float.toString(gyroY), Float.toString(gyroZ),
+                    Float.toString(magnetX), Float.toString(magnetY), Float.toString(magnetZ),
+                    Float.toString(lightValue),
+                    Double.toString(currDisplacement),
+                    Double.toString(totalRotationDegrees),
+                    mBearing,
+                    dir,
+                    cardinalDir};
+
+
+            //System.out.println(data);
+            writer.writeNext(data); //CSVWriter
+            //write to file
+            */
+
+
+            String data = sdfFine.format(new Date()) + "," + //timestamp
+                    Float.toString(accelX) + "," + Float.toString(accelY) + "," + Float.toString(accelZ) + "," +
+                    Float.toString(gyroX) + "," + Float.toString(gyroY) + "," + Float.toString(gyroZ) + "," +
+                    Float.toString(magnetX) + "," + Float.toString(magnetY) + "," + Float.toString(magnetZ) + "," +
+                    Float.toString(lightValue) + "," +
+                    Double.toString(currDisplacement) + "," +
+                    Double.toString(totalRotationDegrees) + "," +
                     mBearing + "," +
                     dir + "," +
-                    cardinalDir + "\n";
+                    cardinalDir + "," + "\n";
+
+            try{
+                fWriter = new FileWriter(file, true);
+                fWriter.write(data);
+                fWriter.flush();
+                fWriter.close();
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            /*
+            try {
+                fos = openFileOutput(fileName, Context.MODE_APPEND);
+                fos.write(data.getBytes());
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            */
         }
-        System.out.println(data);
     }
 
     @Override
@@ -344,6 +437,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return value;
         } else {
             return 180 + (180 + value);
+        }
+    }
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
         }
     }
 }
