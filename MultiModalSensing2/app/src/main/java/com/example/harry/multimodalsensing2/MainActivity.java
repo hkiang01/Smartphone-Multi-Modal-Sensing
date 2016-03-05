@@ -10,15 +10,20 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
 
     private double STEP_LENGTH = 1.0d; //in units
+    private boolean liveDisplayMode = true;
 
     private SensorManager sensorManager;
     String mBearing;
+    double degrees = 0.0d;
     TextView BearingValueView;
     String dir = "N";
     String lastCardinalDir = "";
@@ -26,25 +31,39 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     //ArrayList<String> step_strings = new ArrayList<String>();
     double NS_Manhattan = 0.0d;
     double EW_Manhattan = 0.0d;
+    double currDisplacement = 0.0d;
     double totalRotationDegrees = 0.0d;
     TextView DisplacementValueView;
     TextView TotalRotationValueView;
 
+    float accelX = 0.0f;
+    float accelY = 0.0f;
+    float accelZ = 0.0f;
     TextView AccelXValueView;
     TextView AccelYValueView;
     TextView AccelZValueView;
     float[] mAccelerometer;
 
+    float gyroX = 0.0f;
+    float gyroY = 0.0f;
+    float gyroZ = 0.0f;
     TextView GyroXValueView;
     TextView GyroYValueView;
     TextView GyroZValueView;
     float[] mGeomagnetic;
 
+    float magnetX = 0.0f;
+    float magnetY = 0.0f;
+    float magnetZ = 0.0f;
     TextView MagnetXValueView;
     TextView MagnetYValueView;
     TextView MagnetZValueView;
 
+    float lightValue = 0.0f;
     TextView LightValueView;
+    private String timestampFineFormat = "dd-MM-yy_HH:mm:ss:SSS";
+    private SimpleDateFormat sdfFine = new SimpleDateFormat(timestampFineFormat, Locale.US);
+    String data = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,40 +110,40 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
             // assign directions
             mAccelerometer = event.values;
-            float x=event.values[0];
-            float y=event.values[1];
-            float z=event.values[2];
+            accelX=event.values[0];
+            accelY=event.values[1];
+            accelZ=event.values[2];
 
-            AccelXValueView.setText("X: "+x);
-            AccelYValueView.setText("Y: "+y);
-            AccelZValueView.setText("Z: "+z);
+            AccelXValueView.setText("X: "+accelX);
+            AccelYValueView.setText("Y: "+accelY);
+            AccelZValueView.setText("Z: "+accelZ);
         }
 
         else if(event.sensor.getType()==Sensor.TYPE_GYROSCOPE) {
-            float x=event.values[0];
-            float y=event.values[1];
-            float z=event.values[2];
+            gyroX=event.values[0];
+            gyroY=event.values[1];
+            gyroZ=event.values[2];
 
-            GyroXValueView.setText("X: "+x);
-            GyroYValueView.setText("Y: "+y);
-            GyroZValueView.setText("Z: "+z);
+            GyroXValueView.setText("X: "+gyroX);
+            GyroYValueView.setText("Y: "+gyroY);
+            GyroZValueView.setText("Z: "+gyroZ);
         }
 
         else if(event.sensor.getType()== Sensor.TYPE_MAGNETIC_FIELD) {
             mGeomagnetic = event.values;
-            float x=event.values[0];
-            float y=event.values[1];
-            float z=event.values[2];
+            magnetX=event.values[0];
+            magnetY=event.values[1];
+            magnetZ=event.values[2];
 
-            MagnetXValueView.setText("X: "+x);
-            MagnetYValueView.setText("Y: "+y);
-            MagnetZValueView.setText("Z: "+z);
+            MagnetXValueView.setText("X: "+magnetX);
+            MagnetYValueView.setText("Y: "+magnetY);
+            MagnetZValueView.setText("Z: "+magnetZ);
         }
 
         else if(event.sensor.getType()==Sensor.TYPE_LIGHT) {
-            float l=event.values[0];
+            lightValue=event.values[0];
 
-            LightValueView.setText("Light: "+l);
+            LightValueView.setText("Light: "+lightValue);
         }
 
         if (mAccelerometer != null && mGeomagnetic != null) {
@@ -140,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 double azimuth = 180 * orientation[0] / Math.PI;
                 // double pitch = 180 * orientation[1] / Math.PI;
                 // double roll = 180 * orientation[2] / Math.PI;
-                double degrees = normalizeDegree(azimuth);
+                degrees = normalizeDegree(azimuth);
                 mBearing = String.format("%.3f", degrees);
                 if ((degrees > 0 && degrees <= 22.5) || degrees > 337.5) {
                     dir = "N";
@@ -165,9 +184,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
                 //mBearingDialog.setMessage("Dir: " + dir + " Bearing: " + mBearing);
                 BearingValueView.setText("Dir: " + dir + " Bearing: " + mBearing);
-
             }
         }
+
+        //row data entry
+        if(liveDisplayMode) {
+            data = sdfFine.format(new Date())/*.toString()*/ + "," + //timestamp
+                    //.substring(3) to get rid of "X: "
+                    accelX + "," + accelY + "," + accelZ + "," +
+                    gyroX + "," + gyroY + "," + gyroZ + "," +
+                    magnetX + "," + magnetY + "," + magnetZ + "," +
+                    lightValue + "," +
+                    currDisplacement + "," +
+                    totalRotationDegrees + "," +
+                    mBearing + "," +
+                    dir + "," +
+                    cardinalDir + "\n";
+        }
+        System.out.println(data);
     }
 
     @Override
@@ -301,8 +335,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         //hypotenuse = sqrt(x^2+y^2)
-        double hypotenuse = Math.sqrt(Math.pow(NS_Manhattan, 2.0d) + Math.pow(EW_Manhattan, 2.0d));
-        DisplacementValueView.setText("Displacement: " + Double.toString(hypotenuse));
+        currDisplacement = Math.sqrt(Math.pow(NS_Manhattan, 2.0d) + Math.pow(EW_Manhattan, 2.0d));
+        DisplacementValueView.setText("Displacement: " + Double.toString(currDisplacement));
     }
 
     private double normalizeDegree(double value) {
