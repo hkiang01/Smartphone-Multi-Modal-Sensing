@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     Double.toString(totalRotationDegrees) + "," +
                     mBearing + "," +
                     dir + "," +
-                    cardinalDir + "," + "\n";
+                    cardinalDir + "\n";
 
             try{
                 fWriter = new FileWriter(file, true);
