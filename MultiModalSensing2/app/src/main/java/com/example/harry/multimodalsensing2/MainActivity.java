@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
 
@@ -20,21 +21,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     String mBearing;
     TextView BearingValueView;
     String dir = "N";
-    ArrayList<String> step_strings = new ArrayList<String>();
-    /*
-    double Noffset = 0.0f;
-    double NEoffset = 0.0f;
-    double Eoffset = 0.0f;
-    double SEoffset = 0.0f;
-    double Soffset = 0.0f;
-    double SWoffset = 0.0f;
-    double Woffset = 0.0f;
-    double NWoffset = 0.0f;
-    */
+    String lastCardinalDir = "";
+    String cardinalDir = "N";
+    //ArrayList<String> step_strings = new ArrayList<String>();
     double NS_Manhattan = 0.0d;
     double EW_Manhattan = 0.0d;
+    double totalRotationDegrees = 0.0d;
     TextView DisplacementValueView;
-
+    TextView TotalRotationValueView;
 
     TextView AccelXValueView;
     TextView AccelYValueView;
@@ -89,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         LightValueView=(TextView)findViewById(R.id.LightcoordView);
         BearingValueView=(TextView)findViewById(R.id.BearingView);
         DisplacementValueView=(TextView)findViewById(R.id.DisplacementView);
+        TotalRotationValueView=(TextView)findViewById(R.id.TotalRotationView);
     }
 
     @Override
@@ -149,18 +144,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 mBearing = String.format("%.3f", degrees);
                 if ((degrees > 0 && degrees <= 22.5) || degrees > 337.5) {
                     dir = "N";
+                    cardinalDir = "N";
                 } else if (degrees > 22.5 && degrees <= 67.5) {
                     dir = "NE";
                 } else if (degrees > 67.5 && degrees <= 112.5) {
                     dir = "E";
+                    cardinalDir = "E";
                 } else if (degrees > 112.5 && degrees <= 157.5) {
                     dir = "SE";
                 } else if (degrees > 157.5 && degrees <= 222.5) {
                     dir = "S";
+                    cardinalDir = "S";
                 } else if (degrees > 222.5 && degrees <= 247.5) {
                     dir = "SW";
                 } else if (degrees > 247.5 && degrees <= 292.5) {
                     dir = "W";
+                    cardinalDir = "W";
                 } else if (degrees > 292.5 && degrees <= 337.5) {
                     dir = "NW";
                 }
@@ -177,42 +176,122 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onStep(View view) {
+
+        //total rotation
+        if(!cardinalDir.equals(lastCardinalDir) && !lastCardinalDir.isEmpty()) {
+            switch(lastCardinalDir) {
+                case "N":
+                    switch(cardinalDir) {
+                        case "N":
+                            //same direction, do nothing
+                            break;
+                        case "E":
+                            totalRotationDegrees += 90.0;
+                            break;
+                        case "S":
+                            totalRotationDegrees += 180.0;
+                            break;
+                        case "W":
+                            totalRotationDegrees += 90.0;
+                            break;
+                        default:
+                            //Do nothing
+                            break;
+                    }
+                    break;
+                case "E":
+                    switch(cardinalDir) {
+                        case "E":
+                            //same direction, do nothing
+                            break;
+                        case "S":
+                            totalRotationDegrees += 90.0;
+                            break;
+                        case "W":
+                            totalRotationDegrees += 180.0;
+                            break;
+                        case "N":
+                            totalRotationDegrees += 90.0;
+                            break;
+                        default:
+                            //Do nothing
+                            break;
+                    }
+                    break;
+                case "S":
+                    switch(cardinalDir) {
+                        case "S":
+                            //same direction, do nothing
+                            break;
+                        case "W":
+                            totalRotationDegrees += 90.0;
+                            break;
+                        case "N":
+                            totalRotationDegrees += 180.0;
+                            break;
+                        case "E":
+                            totalRotationDegrees += 90.0;
+                            break;
+                        default:
+                            //Do nothing
+                            break;
+                    }
+                    break;
+                case "W":
+                    switch(cardinalDir) {
+                        case "W":
+                            //same direction, do nothing
+                            break;
+                        case "N":
+                            totalRotationDegrees += 90.0;
+                            break;
+                        case "E":
+                            totalRotationDegrees += 180.0;
+                            break;
+                        case "S":
+                            totalRotationDegrees += 90.0;
+                            break;
+                        default:
+                            //Do nothing
+                            break;
+                    }
+                    break;
+                default:
+                    //Do nothing
+                    break;
+            }
+            TotalRotationValueView.setText("Total Rotation: " + Double.toString(totalRotationDegrees));
+        }
+        lastCardinalDir = cardinalDir;
+
         //dir is the current direction
-        step_strings.add(dir);//adds direction to steps
+        //step_strings.add(dir);//adds direction to steps
         switch(dir) {
             case "N":
-                //Noffset++;
                 NS_Manhattan += 1.0d * STEP_LENGTH;
                 break;
             case "NE":
-                //NEoffset++;
                 NS_Manhattan += Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
                 EW_Manhattan += Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
                 break;
             case "E":
-                //Eoffset++;
                 EW_Manhattan += 1.0d * STEP_LENGTH;
                 break;
             case "SE":
-                //SEoffset++;
                 NS_Manhattan -= Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
                 EW_Manhattan += Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
                 break;
             case "S":
-                //Soffset++;
                 NS_Manhattan -= 1.0d * STEP_LENGTH;
                 break;
             case "SW":
-                //SWoffset++;
                 NS_Manhattan -= Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
                 EW_Manhattan -= Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
                 break;
             case "W":
-                //Woffset++;
                 EW_Manhattan -= 1.0d * STEP_LENGTH;
                 break;
             case "NW":
-                //NWoffset++;
                 NS_Manhattan += Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
                 EW_Manhattan -= Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
                 break;
