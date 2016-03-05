@@ -1,5 +1,5 @@
 ## ECE/CS 498: Mobile Sensing, Computing, and Applications
-## Programming Assignment 1: Exploring Multi-Modal Sensing on Smartphones
+## [Programming Assignment 1: Exploring Multi-Modal Sensing on Smartphones](https://courses.engr.illinois.edu/ece498rc4/slides/PA1_ece498rr.pdf)
 
 ### Harrrison Kiang (hkiang2) and Sara Akgul (akgul1)
 
@@ -38,3 +38,5 @@
   - Generate the relevant graph, the 20 best of which are located in analysis/plots directory
 
   - Best: All Activities: AccY_Variance vs Light_Maxima vs AccX_Mean.png
+
+![All Activities: AccY Variance vs Light Maxima vs AccX Mean](https://github.com/hkiang01/Smartphone-Multi-Modal-Sensing/blob/master/analysis/plots/All%20Activities:%20AccY_Variance%20vs%20Light_Maxima%20vs%20AccX_Mean.png?raw=true "All Activities: AccY Variance vs Light Maxima vs AccX Mean")
