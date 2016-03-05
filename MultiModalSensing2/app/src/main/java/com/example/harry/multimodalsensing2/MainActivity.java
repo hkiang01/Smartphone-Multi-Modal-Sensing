@@ -7,12 +7,34 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
+
+    private double STEP_LENGTH = 1.0d; //in units
 
     private SensorManager sensorManager;
     String mBearing;
     TextView BearingValueView;
+    String dir = "N";
+    ArrayList<String> step_strings = new ArrayList<String>();
+    /*
+    double Noffset = 0.0f;
+    double NEoffset = 0.0f;
+    double Eoffset = 0.0f;
+    double SEoffset = 0.0f;
+    double Soffset = 0.0f;
+    double SWoffset = 0.0f;
+    double Woffset = 0.0f;
+    double NWoffset = 0.0f;
+    */
+    double NS_Manhattan = 0.0d;
+    double EW_Manhattan = 0.0d;
+    TextView DisplacementValueView;
+
 
     TextView AccelXValueView;
     TextView AccelYValueView;
@@ -66,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         MagnetZValueView=(TextView)findViewById(R.id.MagnetZcoordView);
         LightValueView=(TextView)findViewById(R.id.LightcoordView);
         BearingValueView=(TextView)findViewById(R.id.BearingView);
+        DisplacementValueView=(TextView)findViewById(R.id.DisplacementView);
     }
 
     @Override
@@ -124,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 // double roll = 180 * orientation[2] / Math.PI;
                 double degrees = normalizeDegree(azimuth);
                 mBearing = String.format("%.3f", degrees);
-                String dir = "N";
                 if ((degrees > 0 && degrees <= 22.5) || degrees > 337.5) {
                     dir = "N";
                 } else if (degrees > 22.5 && degrees <= 67.5) {
@@ -152,6 +174,56 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public void onStep(View view) {
+        //dir is the current direction
+        step_strings.add(dir);//adds direction to steps
+        switch(dir) {
+            case "N":
+                //Noffset++;
+                NS_Manhattan += 1.0d * STEP_LENGTH;
+                break;
+            case "NE":
+                //NEoffset++;
+                NS_Manhattan += Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
+                EW_Manhattan += Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
+                break;
+            case "E":
+                //Eoffset++;
+                EW_Manhattan += 1.0d * STEP_LENGTH;
+                break;
+            case "SE":
+                //SEoffset++;
+                NS_Manhattan -= Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
+                EW_Manhattan += Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
+                break;
+            case "S":
+                //Soffset++;
+                NS_Manhattan -= 1.0d * STEP_LENGTH;
+                break;
+            case "SW":
+                //SWoffset++;
+                NS_Manhattan -= Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
+                EW_Manhattan -= Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
+                break;
+            case "W":
+                //Woffset++;
+                EW_Manhattan -= 1.0d * STEP_LENGTH;
+                break;
+            case "NW":
+                //NWoffset++;
+                NS_Manhattan += Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
+                EW_Manhattan -= Math.sqrt(2.0d)/2.0d * STEP_LENGTH;
+                break;
+            default:
+                //Do nothing
+                break;
+        }
+
+        //hypotenuse = sqrt(x^2+y^2)
+        double hypotenuse = Math.sqrt(Math.pow(NS_Manhattan, 2.0d) + Math.pow(EW_Manhattan, 2.0d));
+        DisplacementValueView.setText("Displacement: " + Double.toString(hypotenuse));
     }
 
     private double normalizeDegree(double value) {

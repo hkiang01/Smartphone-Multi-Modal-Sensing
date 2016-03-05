@@ -107,4 +107,25 @@
         android:layout_below="@id/LightcoordView"
         />
 
+    <TextView
+        android:id="@+id/DisplacementView"
+        android:text="Displacement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/sensorview_text_size"
+        android:layout_below="@id/BearingView"
+        />
+
+    <Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/button_step"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Step"
+        android:onClick="onStep"
+        android:layout_gravity="center_horizontal"
+        android:textSize="@dimen/button_step_size"
+        android:layout_below="@+id/DisplacementView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="86dp" />
+
 </RelativeLayout>
