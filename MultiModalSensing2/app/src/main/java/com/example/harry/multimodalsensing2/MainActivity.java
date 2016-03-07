@@ -117,6 +117,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         verifyStoragePermissions(this);
 
+        //Register listeners for groundTruthButton[N|E|S|W]
+        groundTruthButtonNorth = (ImageButton) findViewById(R.id.imageButtonTop);
+        groundTruthButtonEast = (ImageButton) findViewById(R.id.imageButtonRight);
+        groundTruthButtonSouth = (ImageButton) findViewById(R.id.imageButtonBottom);
+        groundTruthButtonWest = (ImageButton) findViewById(R.id.imageButtonLeft);
+        groundTruthButtonNorth.setOnClickListener(groundTruthButtonNorthHandler);
+        groundTruthButtonEast.setOnClickListener(groundTruthButtonEastHandler);
+        groundTruthButtonSouth.setOnClickListener(groundTruthButtonSouthHandler);
+        groundTruthButtonWest.setOnClickListener(groundTruthButtonWestHandler);
+
+        path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        fileName = "ACTIVITY_" + sdfFine.format(new Date()) + ".csv";
+        file = new File(path, fileName);
+        if(!file.exists()) {
+            logMode = true;
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("File: " + file.getAbsolutePath());
+        }
+        else {
+            System.out.println("Failed to create file!");
+        }
+        //file.setWritable(true, false);
+        file.setReadable(true, false);
+
+
         //header entry
         if(logMode || logAnyways) {
             String data = "TimeStamp" + "," + //timestamp
@@ -141,15 +170,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
 
-        //Register listeners for groundTruthButton[N|E|S|W]
-        groundTruthButtonNorth = (ImageButton) findViewById(R.id.imageButtonTop);
-        groundTruthButtonEast = (ImageButton) findViewById(R.id.imageButtonRight);
-        groundTruthButtonSouth = (ImageButton) findViewById(R.id.imageButtonBottom);
-        groundTruthButtonWest = (ImageButton) findViewById(R.id.imageButtonLeft);
-        groundTruthButtonNorth.setOnClickListener(groundTruthButtonNorthHandler);;
-        groundTruthButtonEast.setOnClickListener(groundTruthButtonEastHandler);;
-        groundTruthButtonSouth.setOnClickListener(groundTruthButtonSouthHandler);;
-        groundTruthButtonWest.setOnClickListener(groundTruthButtonWestHandler);;
+        //Link to layout
+        AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
+        AccelYValueView=(TextView)findViewById(R.id.AccelYcoordView);
+        AccelZValueView=(TextView)findViewById(R.id.AccelZcoordView);
+        GyroXValueView=(TextView)findViewById(R.id.GyroXcoordView);
+        GyroYValueView=(TextView)findViewById(R.id.GyroYcoordView);
+        GyroZValueView=(TextView)findViewById(R.id.GyroZcoordView);
+        MagnetXValueView=(TextView)findViewById(R.id.MagnetXcoordView);
+        MagnetYValueView=(TextView)findViewById(R.id.MagnetYcoordView);
+        MagnetZValueView=(TextView)findViewById(R.id.MagnetZcoordView);
+        LightValueView=(TextView)findViewById(R.id.LightcoordView);
+        BearingValueView=(TextView)findViewById(R.id.BearingView);
+        DisplacementValueView=(TextView)findViewById(R.id.DisplacementView);
+        TotalRotationValueView=(TextView)findViewById(R.id.TotalRotationView);
 
         //Register sensor manager
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
@@ -170,38 +204,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
-        //Link to layout
-        AccelXValueView=(TextView)findViewById(R.id.AccelXcoordView);
-        AccelYValueView=(TextView)findViewById(R.id.AccelYcoordView);
-        AccelZValueView=(TextView)findViewById(R.id.AccelZcoordView);
-        GyroXValueView=(TextView)findViewById(R.id.GyroXcoordView);
-        GyroYValueView=(TextView)findViewById(R.id.GyroYcoordView);
-        GyroZValueView=(TextView)findViewById(R.id.GyroZcoordView);
-        MagnetXValueView=(TextView)findViewById(R.id.MagnetXcoordView);
-        MagnetYValueView=(TextView)findViewById(R.id.MagnetYcoordView);
-        MagnetZValueView=(TextView)findViewById(R.id.MagnetZcoordView);
-        LightValueView=(TextView)findViewById(R.id.LightcoordView);
-        BearingValueView=(TextView)findViewById(R.id.BearingView);
-        DisplacementValueView=(TextView)findViewById(R.id.DisplacementView);
-        TotalRotationValueView=(TextView)findViewById(R.id.TotalRotationView);
-
-        path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        fileName = "ACTIVITY_" + sdfFine.format(new Date()) + ".csv";
-        file = new File(path, fileName);
-        if(!file.exists()) {
-            logMode = true;
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("File: " + file.getAbsolutePath());
-        }
-        else {
-            System.out.println("Failed to create file!");
-        }
-        //file.setWritable(true, false);
-        file.setReadable(true, false);
     }
 
     @Override

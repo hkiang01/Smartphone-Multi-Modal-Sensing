@@ -6,7 +6,7 @@ degree_col<-14
 dir_col<-16
 ground_truth_col<-17
 setwd('/Users/harry/projects/ece498rr/analysis2/')
-wdat<-read.csv('ACTIVITY_06-03-16_20-59-14-493.csv', header=TRUE, na.strings=c("", "null", "NA"))
+wdat<-read.csv('ACTIVITY_06-03-16_21-28-16-767.csv', header=TRUE, na.strings=c("", "null", "NA"))
 
 date_and_degrees<-wdat[,c(timestamp_col, degree_col, dir_col,ground_truth_col)]
 date_and_degrees<-na.omit(date_and_degrees) #remove na's
