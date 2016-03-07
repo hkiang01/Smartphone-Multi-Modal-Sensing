@@ -133,8 +133,43 @@
         android:onClick="onStep"
         android:layout_gravity="center_horizontal"
         android:textSize="@dimen/button_step_size"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButtonTop"
+        android:src="@drawable/ic_action_arrow_top"
         android:layout_below="@+id/TotalRotationView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="86dp" />
+        android:layout_toRightOf="@+id/imageButtonLeft"
+        android:layout_toEndOf="@+id/imageButtonLeft" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButtonBottom"
+        android:src="@drawable/ic_action_arrow_bottom"
+        android:layout_below="@+id/imageButtonLeft"
+        android:layout_toRightOf="@+id/imageButtonLeft"
+        android:layout_toEndOf="@+id/imageButtonLeft" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButtonLeft"
+        android:src="@drawable/ic_action_arrow_left"
+        android:layout_alignTop="@+id/imageButtonRight"
+        android:layout_centerHorizontal="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButtonRight"
+        android:src="@drawable/ic_action_arrow_right"
+        android:layout_below="@+id/imageButtonTop"
+        android:layout_toRightOf="@+id/imageButtonTop" />
+
 
 </RelativeLayout>

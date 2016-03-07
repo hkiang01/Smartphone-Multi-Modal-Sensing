@@ -8,11 +8,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Image;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.opencsv.CSVWriter;
@@ -38,9 +41,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     String mBearing;
     double degrees = 0.0d;
     TextView BearingValueView;
-    String dir = "N";
+    String dir = "";
     String lastCardinalDir = "";
-    String cardinalDir = "N";
+    String cardinalDir = "";
     //ArrayList<String> step_strings = new ArrayList<String>();
     double NS_Manhattan = 0.0d;
     double EW_Manhattan = 0.0d;
@@ -48,6 +51,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     double totalRotationDegrees = 0.0d;
     TextView DisplacementValueView;
     TextView TotalRotationValueView;
+
+    String groundTruthDir = "";
+    ImageButton groundTruthButtonNorth;
+    ImageButton groundTruthButtonEast;
+    ImageButton groundTruthButtonSouth;
+    ImageButton groundTruthButtonWest;
 
     float accelX = 0.0f;
     float accelY = 0.0f;
@@ -107,6 +116,40 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mContext = getApplicationContext();
         setContentView(R.layout.activity_main);
         verifyStoragePermissions(this);
+
+        //header entry
+        if(logMode || logAnyways) {
+            String data = "TimeStamp" + "," + //timestamp
+                    "Accelerometer_X" + "," + "Accelerometer_Y" + "," + "Accelerometer_Z" + "," +
+                    "Gyroscope_X" + "," + "Gyroscope_Y" + "," + "Gyroscope_Z" + "," +
+                    "Magnetometer_X" + "," + "Magnetometer_Y" + "," + "Magnetometer_Z" + "," +
+                    "Light" + "," +
+                    "Measured Displacement" + "," +
+                    "Total Rotation" + "," +
+                    "Compass Bearing" + "," +
+                    "Compass Direction" + "," +
+                    "Compass Cardinal Direction" + "," +
+                    "Ground Truth Cardinal Direction" + "\n";
+
+            try{
+                fWriter = new FileWriter(file, true);
+                fWriter.write(data);
+                fWriter.flush();
+                fWriter.close();
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        //Register listeners for groundTruthButton[N|E|S|W]
+        groundTruthButtonNorth = (ImageButton) findViewById(R.id.imageButtonTop);
+        groundTruthButtonEast = (ImageButton) findViewById(R.id.imageButtonRight);
+        groundTruthButtonSouth = (ImageButton) findViewById(R.id.imageButtonBottom);
+        groundTruthButtonWest = (ImageButton) findViewById(R.id.imageButtonLeft);
+        groundTruthButtonNorth.setOnClickListener(groundTruthButtonNorthHandler);;
+        groundTruthButtonEast.setOnClickListener(groundTruthButtonEastHandler);;
+        groundTruthButtonSouth.setOnClickListener(groundTruthButtonSouthHandler);;
+        groundTruthButtonWest.setOnClickListener(groundTruthButtonWestHandler);;
 
         //Register sensor manager
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
@@ -245,26 +288,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         //row data entry
         if(logMode || logAnyways) {
-
-            /*
-           String[] data = {sdfFine.format(new Date()), //timestamp
-                    Float.toString(accelX), Float.toString(accelY), Float.toString(accelZ),
-                    Float.toString(gyroX), Float.toString(gyroY), Float.toString(gyroZ),
-                    Float.toString(magnetX), Float.toString(magnetY), Float.toString(magnetZ),
-                    Float.toString(lightValue),
-                    Double.toString(currDisplacement),
-                    Double.toString(totalRotationDegrees),
-                    mBearing,
-                    dir,
-                    cardinalDir};
-
-
-            //System.out.println(data);
-            writer.writeNext(data); //CSVWriter
-            //write to file
-            */
-
-
             String data = sdfFine.format(new Date()) + "," + //timestamp
                     Float.toString(accelX) + "," + Float.toString(accelY) + "," + Float.toString(accelZ) + "," +
                     Float.toString(gyroX) + "," + Float.toString(gyroY) + "," + Float.toString(gyroZ) + "," +
@@ -274,7 +297,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     Double.toString(totalRotationDegrees) + "," +
                     mBearing + "," +
                     dir + "," +
-                    cardinalDir + "\n";
+                    cardinalDir + "," +
+                    groundTruthDir + "\n";
 
             try{
                 fWriter = new FileWriter(file, true);
@@ -284,16 +308,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }catch (Exception e) {
                 e.printStackTrace();
             }
-
-            /*
-            try {
-                fos = openFileOutput(fileName, Context.MODE_APPEND);
-                fos.write(data.getBytes());
-                fos.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            */
         }
     }
 
@@ -453,4 +467,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             );
         }
     }
+
+    View.OnClickListener groundTruthButtonNorthHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+            groundTruthDir = "N";
+        }
+    };
+
+    View.OnClickListener groundTruthButtonEastHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+            groundTruthDir = "E";
+        }
+    };
+
+    View.OnClickListener groundTruthButtonSouthHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+            groundTruthDir = "S";
+        }
+    };
+
+    View.OnClickListener groundTruthButtonWestHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+            groundTruthDir = "W";
+        }
+    };
 }
