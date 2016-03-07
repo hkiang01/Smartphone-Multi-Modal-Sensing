@@ -4,11 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.Image;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     ImageButton groundTruthButtonEast;
     ImageButton groundTruthButtonSouth;
     ImageButton groundTruthButtonWest;
+    Button stepButton;
 
     float accelX = 0.0f;
     float accelY = 0.0f;
@@ -126,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         groundTruthButtonEast.setOnClickListener(groundTruthButtonEastHandler);
         groundTruthButtonSouth.setOnClickListener(groundTruthButtonSouthHandler);
         groundTruthButtonWest.setOnClickListener(groundTruthButtonWestHandler);
+
+        stepButton = (Button) findViewById(R.id.button_step);
+        stepButton.setOnClickListener(stepButtonHandler);
 
         path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         fileName = "ACTIVITY_" + sdfFine.format(new Date()) + ".csv";
@@ -204,6 +210,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR),
+                sensorManager.SENSOR_DELAY_NORMAL);
+
     }
 
     @Override
@@ -245,6 +255,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             lightValue=event.values[0];
 
             LightValueView.setText("Light: "+lightValue);
+        }
+
+        else if(event.sensor.getType()== Sensor.TYPE_STEP_DETECTOR) {
+            stepButton.callOnClick();
         }
 
         if (mAccelerometer != null && mGeomagnetic != null) {
@@ -491,6 +505,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     View.OnClickListener groundTruthButtonWestHandler = new View.OnClickListener() {
         public void onClick(View v) {
             groundTruthDir = "W";
+        }
+    };
+
+    //light up red when step is detected, when onStep is actuated
+    View.OnClickListener stepButtonHandler = new View.OnClickListener() {
+        public void onClick(View v) {
+            final int oldColor = stepButton.getCurrentTextColor();
+            stepButton.setTextColor(Color.RED);
+
+            new CountDownTimer(300, 50) {
+
+                @Override
+                public void onTick(long arg0) {
+                    //auto-generated
+                }
+
+                @Override
+                public void onFinish() {
+                    stepButton.setTextColor(oldColor);
+                }
+
+            }.start();
+
+            onStep(v);
         }
     };
 }
