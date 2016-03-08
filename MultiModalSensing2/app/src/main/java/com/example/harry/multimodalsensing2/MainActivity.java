@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.FloatMath;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private double STEP_LENGTH = 1.0d; //in units as in PA spec
     private boolean logMode = false;
     private boolean logAnyways = false; //for debugging
+    private boolean logGyro = true;
 
     private SensorManager sensorManager;
     String mBearing;
@@ -53,6 +55,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     double totalRotationDegrees = 0.0d;
     TextView DisplacementValueView;
     TextView TotalRotationValueView;
+
+    private static final float NS2S = 1.0f/1000000000.0f;
+    public static final float EPSILON = 0.000000001f;
+    private final float[] deltaRotationVector = new float[4];
+    private float timestamp;
 
     String groundTruthDir = "";
     ImageButton groundTruthButtonNorth;
@@ -101,17 +108,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SimpleDateFormat sdfFine = new SimpleDateFormat(timestampFineFormat, Locale.US);
     private Context mContext;
     private File file;
+    private File fileGyro;
     private File path;
     private FileWriter fWriter;
-    private File newFile;
-    private FileOutputStream fos;
-
-    private String baseDir;
+    private FileWriter fileWriterGyro;
     private String fileName;
-    private String filePath;
-    private File f;
-    private FileWriter mFileWriter;
-    private CSVWriter writer;
+    private String fileNameGyro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,16 +145,33 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("File: " + file.getAbsolutePath());
+            //System.out.println("File: " + file.getAbsolutePath());
         }
         else {
-            System.out.println("Failed to create file!");
+            System.out.println("Failed to create log file!");
         }
         //file.setWritable(true, false);
         file.setReadable(true, false);
 
+        //path=same
+        fileNameGyro = "GYRO_" + sdfFine.format(new Date()) + ".csv";
+        fileGyro = new File(path, fileNameGyro);
+        if(!fileGyro.exists()) {
+            logMode = true;
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //System.out.println("File: " + fileGyro.getAbsolutePath());
+        }
+        else {
+            System.out.println("Failed to create gyro file!");
+        }
+        //fileGyro.setWritable(true, false);
+        fileGyro.setReadable(true, false);
 
-        //header entry
+        //header row
         if(logMode || logAnyways) {
             String data = "TimeStamp" + "," + //timestamp
                     "Accelerometer_X" + "," + "Accelerometer_Y" + "," + "Accelerometer_Z" + "," +
@@ -171,6 +190,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 fWriter.write(data);
                 fWriter.flush();
                 fWriter.close();
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        //header row
+        if(logGyro) {
+            String data = "TimeStamp" + "," +
+                    "gyroRotateX" + "," +
+                    "gyroRotateY" + "," +
+                    "gyroRotateZ" + "\n";
+            try{
+                fileWriterGyro = new FileWriter(fileGyro, true);
+                fileWriterGyro.write(data);
+                fileWriterGyro.flush();
+                fileWriterGyro.close();
             }catch (Exception e) {
                 e.printStackTrace();
             }
@@ -231,6 +266,59 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         else if(event.sensor.getType()==Sensor.TYPE_GYROSCOPE) {
+
+            //integrate over the angular speed to get angular offset (rotation)
+            if(timestamp != 0) {
+                final float dT = (event.timestamp - timestamp) * NS2S;//seconds
+                float axisX = event.values[0];
+                float axisY = event.values[1];
+                float axisZ = event.values[2];
+
+                float angularSpeed = (float)Math.sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
+
+                //Normalize rotation vector
+                //EPSILON is largest allowable margin of error
+                if(angularSpeed > EPSILON) {
+                    axisX /= angularSpeed;
+                    axisY /= angularSpeed;
+                    axisZ /= angularSpeed;
+                }
+
+                //integrate around axis by timestep to get delta rotation over timestep
+                float thetaOverTwo = angularSpeed*dT/2.0f;
+                float sinThetaOverTwo = (float)Math.sin(thetaOverTwo);
+                float cosThetaOverTwo = (float)Math.cos(thetaOverTwo);
+                deltaRotationVector[0] = sinThetaOverTwo * axisX;//x points to the right
+                deltaRotationVector[1] = sinThetaOverTwo * axisY;//y points forward
+                deltaRotationVector[2] = sinThetaOverTwo * axisZ;//z points to sky
+                deltaRotationVector[3] = cosThetaOverTwo;
+
+                //interested in rotation about z axis, or deltaRotationVector[2]
+            }
+            timestamp = event.timestamp;
+            float[] deltaRotationMatrix = new float[9];
+            SensorManager.getRotationMatrixFromVector(deltaRotationMatrix, deltaRotationVector);
+            /*System.out.println("gyroRotateX: " + deltaRotationVector[0] +
+                                " gyroRotateY: " + deltaRotationVector[1] +
+                                " gyroRotateZ: " + deltaRotationVector[2]); */
+
+            //row data entry
+            if(logGyro) {
+                String data = sdfFine.format(new Date()) + "," + //timestamp
+                        deltaRotationVector[0] + "," +
+                        deltaRotationVector[1] + "," +
+                        deltaRotationVector[2] + "\n";
+
+                try{
+                    fileWriterGyro = new FileWriter(fileGyro, true);
+                    fileWriterGyro.write(data);
+                    fileWriterGyro.flush();
+                    fileWriterGyro.close();
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             gyroX=event.values[0];
             gyroY=event.values[1];
             gyroZ=event.values[2];
