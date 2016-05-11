@@ -39,4 +39,4 @@
 
   - Best: All Activities: AccY_Variance vs Light_Maxima vs AccX_Mean.png
 
-![All Activities: AccY Variance vs Light Maxima vs AccX Mean](https://github.com/hkiang01/Smartphone-Multi-Modal-Sensing/blob/master/analysis/plots/All%20Activities:%20AccY_Variance%20vs%20Light_Maxima%20vs%20AccX_Mean.png?raw=true "All Activities: AccY Variance vs Light Maxima vs AccX Mean")
+![All Activities: AccY Variance vs Light Maxima vs AccX Mean](https://raw.githubusercontent.com/hkiang01/Smartphone-Multi-Modal-Sensing/07072101dd772156d5e8995b07a20058bb5e7aa8/analysis/plots/All%20Activities%3A%20AccY_Variance%20vs%20Light_Maxima%20vs%20AccX_Mean.png?token=AFMhnYrF7PFuDhmJ3GYSUC9ngrMey-ZLks5XPAhNwA%3D%3D)
